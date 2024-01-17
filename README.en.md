@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/songquanpeng/one-api"><img src="https://raw.githubusercontent.com/songquanpeng/one-api/main/web/public/logo.png" width="150" height="150" alt="one-api logo"></a>
+  <a href="https://github.com/songquanpeng/one-api"><img src="https://raw.githubusercontent.com/songquanpeng/one-api/main/web/default/public/logo.png" width="150" height="150" alt="one-api logo"></a>
 </p>
 
 <div align="center">
@@ -60,7 +60,7 @@ _✨ Access all LLM through the standard OpenAI API format, easy to deploy & use
 1. Support for multiple large models:
    + [x] [OpenAI ChatGPT Series Models](https://platform.openai.com/docs/guides/gpt/chat-completions-api) (Supports [Azure OpenAI API](https://learn.microsoft.com/en-us/azure/ai-services/openai/reference))
    + [x] [Anthropic Claude Series Models](https://anthropic.com)
-   + [x] [Google PaLM2 Series Models](https://developers.generativeai.google)
+   + [x] [Google PaLM2 and Gemini Series Models](https://developers.generativeai.google)
    + [x] [Baidu Wenxin Yiyuan Series Models](https://cloud.baidu.com/doc/WENXINWORKSHOP/index.html)
    + [x] [Alibaba Tongyi Qianwen Series Models](https://help.aliyun.com/document_detail/2400395.html)
    + [x] [Zhipu ChatGLM Series Models](https://bigmodel.cn)
@@ -188,6 +188,8 @@ If you encounter a blank page after deployment, refer to [#97](https://github.co
 <div>
 
 > Zeabur's servers are located overseas, automatically solving network issues, and the free quota is sufficient for personal usage.
+
+[![Deploy on Zeabur](https://zeabur.com/button.svg)](https://zeabur.com/templates/7Q0KO3)
 
 1. First, fork the code.
 2. Go to [Zeabur](https://zeabur.com?referralCode=songquanpeng), log in, and enter the console.

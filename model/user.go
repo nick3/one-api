@@ -15,7 +15,7 @@ type User struct {
 	Username         string `json:"username" gorm:"unique;index" validate:"max=12"`
 	Password         string `json:"password" gorm:"not null;" validate:"min=8,max=20"`
 	DisplayName      string `json:"display_name" gorm:"index" validate:"max=20"`
-	Role             int    `json:"role" gorm:"type:int;default:1"`   // admin, common
+	Role             int    `json:"role" gorm:"type:int;default:1"`   // admin, util
 	Status           int    `json:"status" gorm:"type:int;default:1"` // enabled, disabled
 	Email            string `json:"email" gorm:"index" validate:"max=50"`
 	GitHubId         string `json:"github_id" gorm:"column:github_id;index"`
@@ -42,7 +42,11 @@ func GetAllUsers(startIdx int, num int) (users []*User, err error) {
 }
 
 func SearchUsers(keyword string) (users []*User, err error) {
-	err = DB.Omit("password").Where("id = ? or username LIKE ? or email LIKE ? or display_name LIKE ?", keyword, keyword+"%", keyword+"%", keyword+"%").Find(&users).Error
+	if !common.UsingPostgreSQL {
+		err = DB.Omit("password").Where("id = ? or username LIKE ? or email LIKE ? or display_name LIKE ?", keyword, keyword+"%", keyword+"%", keyword+"%").Find(&users).Error
+	} else {
+		err = DB.Omit("password").Where("username LIKE ? or email LIKE ? or display_name LIKE ?", keyword+"%", keyword+"%", keyword+"%").Find(&users).Error
+	}
 	return users, err
 }
 
@@ -137,7 +141,15 @@ func (user *User) ValidateAndFill() (err error) {
 	if user.Username == "" || password == "" {
 		return errors.New("用户名或密码为空")
 	}
-	DB.Where(User{Username: user.Username}).First(user)
+	err = DB.Where("username = ?", user.Username).First(user).Error
+	if err != nil {
+		// we must make sure check username firstly
+		// consider this case: a malicious user set his username as other's email
+		err := DB.Where("email = ?", user.Username).First(user).Error
+		if err != nil {
+			return errors.New("用户名或密码错误，或用户已被封禁")
+		}
+	}
 	okay := common.ValidatePasswordAndHash(password, user.Password)
 	if !okay || user.Status != common.UserStatusEnabled {
 		return errors.New("用户名或密码错误，或用户已被封禁")
@@ -266,7 +278,12 @@ func GetUserEmail(id int) (email string, err error) {
 }
 
 func GetUserGroup(id int) (group string, err error) {
-	err = DB.Model(&User{}).Where("id = ?", id).Select("`group`").Find(&group).Error
+	groupCol := "`group`"
+	if common.UsingPostgreSQL {
+		groupCol = `"group"`
+	}
+
+	err = DB.Model(&User{}).Where("id = ?", id).Select(groupCol).Find(&group).Error
 	return group, err
 }
 
@@ -309,7 +326,8 @@ func GetRootUserEmail() (email string) {
 
 func UpdateUserUsedQuotaAndRequestCount(id int, quota int) {
 	if common.BatchUpdateEnabled {
-		addNewRecord(BatchUpdateTypeUsedQuotaAndRequestCount, id, quota)
+		addNewRecord(BatchUpdateTypeUsedQuota, id, quota)
+		addNewRecord(BatchUpdateTypeRequestCount, id, 1)
 		return
 	}
 	updateUserUsedQuotaAndRequestCount(id, quota, 1)
@@ -324,6 +342,24 @@ func updateUserUsedQuotaAndRequestCount(id int, quota int, count int) {
 	).Error
 	if err != nil {
 		common.SysError("failed to update user used quota and request count: " + err.Error())
+	}
+}
+
+func updateUserUsedQuota(id int, quota int) {
+	err := DB.Model(&User{}).Where("id = ?", id).Updates(
+		map[string]interface{}{
+			"used_quota": gorm.Expr("used_quota + ?", quota),
+		},
+	).Error
+	if err != nil {
+		common.SysError("failed to update user used quota: " + err.Error())
+	}
+}
+
+func updateUserRequestCount(id int, count int) {
+	err := DB.Model(&User{}).Where("id = ?", id).Update("request_count", gorm.Expr("request_count + ?", count)).Error
+	if err != nil {
+		common.SysError("failed to update user request count: " + err.Error())
 	}
 }
 

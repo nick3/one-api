@@ -2,8 +2,8 @@ package controller
 
 import (
 	"fmt"
-
 	"github.com/gin-gonic/gin"
+	"one-api/relay/channel/openai"
 )
 
 // https://platform.openai.com/docs/api-reference/models/list
@@ -55,12 +55,21 @@ func init() {
 	// https://platform.openai.com/docs/models/model-endpoint-compatibility
 	openAIModels = []OpenAIModels{
 		{
-			Id:         "dall-e",
+			Id:         "dall-e-2",
 			Object:     "model",
 			Created:    1677649963,
 			OwnedBy:    "openai",
 			Permission: permission,
-			Root:       "dall-e",
+			Root:       "dall-e-2",
+			Parent:     nil,
+		},
+		{
+			Id:         "dall-e-3",
+			Object:     "model",
+			Created:    1677649963,
+			OwnedBy:    "openai",
+			Permission: permission,
+			Root:       "dall-e-3",
 			Parent:     nil,
 		},
 		{
@@ -70,6 +79,42 @@ func init() {
 			OwnedBy:    "openai",
 			Permission: permission,
 			Root:       "whisper-1",
+			Parent:     nil,
+		},
+		{
+			Id:         "tts-1",
+			Object:     "model",
+			Created:    1677649963,
+			OwnedBy:    "openai",
+			Permission: permission,
+			Root:       "tts-1",
+			Parent:     nil,
+		},
+		{
+			Id:         "tts-1-1106",
+			Object:     "model",
+			Created:    1677649963,
+			OwnedBy:    "openai",
+			Permission: permission,
+			Root:       "tts-1-1106",
+			Parent:     nil,
+		},
+		{
+			Id:         "tts-1-hd",
+			Object:     "model",
+			Created:    1677649963,
+			OwnedBy:    "openai",
+			Permission: permission,
+			Root:       "tts-1-hd",
+			Parent:     nil,
+		},
+		{
+			Id:         "tts-1-hd-1106",
+			Object:     "model",
+			Created:    1677649963,
+			OwnedBy:    "openai",
+			Permission: permission,
+			Root:       "tts-1-hd-1106",
 			Parent:     nil,
 		},
 		{
@@ -115,6 +160,15 @@ func init() {
 			OwnedBy:    "openai",
 			Permission: permission,
 			Root:       "gpt-3.5-turbo-16k-0613",
+			Parent:     nil,
+		},
+		{
+			Id:         "gpt-3.5-turbo-1106",
+			Object:     "model",
+			Created:    1699593571,
+			OwnedBy:    "openai",
+			Permission: permission,
+			Root:       "gpt-3.5-turbo-1106",
 			Parent:     nil,
 		},
 		{
@@ -178,6 +232,24 @@ func init() {
 			OwnedBy:    "openai",
 			Permission: permission,
 			Root:       "gpt-4-32k-0613",
+			Parent:     nil,
+		},
+		{
+			Id:         "gpt-4-1106-preview",
+			Object:     "model",
+			Created:    1699593571,
+			OwnedBy:    "openai",
+			Permission: permission,
+			Root:       "gpt-4-1106-preview",
+			Parent:     nil,
+		},
+		{
+			Id:         "gpt-4-vision-preview",
+			Object:     "model",
+			Created:    1699593571,
+			OwnedBy:    "openai",
+			Permission: permission,
+			Root:       "gpt-4-vision-preview",
 			Parent:     nil,
 		},
 		{
@@ -271,10 +343,28 @@ func init() {
 			Parent:     nil,
 		},
 		{
+			Id:         "davinci-002",
+			Object:     "model",
+			Created:    1677649963,
+			OwnedBy:    "openai",
+			Permission: permission,
+			Root:       "davinci-002",
+			Parent:     nil,
+		},
+		{
+			Id:         "babbage-002",
+			Object:     "model",
+			Created:    1677649963,
+			OwnedBy:    "openai",
+			Permission: permission,
+			Root:       "babbage-002",
+			Parent:     nil,
+		},
+		{
 			Id:         "claude-instant-1",
 			Object:     "model",
 			Created:    1677649963,
-			OwnedBy:    "anturopic",
+			OwnedBy:    "anthropic",
 			Permission: permission,
 			Root:       "claude-instant-1",
 			Parent:     nil,
@@ -283,9 +373,27 @@ func init() {
 			Id:         "claude-2",
 			Object:     "model",
 			Created:    1677649963,
-			OwnedBy:    "anturopic",
+			OwnedBy:    "anthropic",
 			Permission: permission,
 			Root:       "claude-2",
+			Parent:     nil,
+		},
+		{
+			Id:         "claude-2.1",
+			Object:     "model",
+			Created:    1677649963,
+			OwnedBy:    "anthropic",
+			Permission: permission,
+			Root:       "claude-2.1",
+			Parent:     nil,
+		},
+		{
+			Id:         "claude-2.0",
+			Object:     "model",
+			Created:    1677649963,
+			OwnedBy:    "anthropic",
+			Permission: permission,
+			Root:       "claude-2.0",
 			Parent:     nil,
 		},
 		{
@@ -307,6 +415,15 @@ func init() {
 			Parent:     nil,
 		},
 		{
+			Id:         "ERNIE-Bot-4",
+			Object:     "model",
+			Created:    1677649963,
+			OwnedBy:    "baidu",
+			Permission: permission,
+			Root:       "ERNIE-Bot-4",
+			Parent:     nil,
+		},
+		{
 			Id:         "Embedding-V1",
 			Object:     "model",
 			Created:    1677649963,
@@ -319,9 +436,36 @@ func init() {
 			Id:         "PaLM-2",
 			Object:     "model",
 			Created:    1677649963,
-			OwnedBy:    "google",
+			OwnedBy:    "google palm",
 			Permission: permission,
 			Root:       "PaLM-2",
+			Parent:     nil,
+		},
+		{
+			Id:         "gemini-pro",
+			Object:     "model",
+			Created:    1677649963,
+			OwnedBy:    "google gemini",
+			Permission: permission,
+			Root:       "gemini-pro",
+			Parent:     nil,
+		},
+		{
+			Id:         "gemini-pro-vision",
+			Object:     "model",
+			Created:    1677649963,
+			OwnedBy:    "google gemini",
+			Permission: permission,
+			Root:       "gemini-pro-vision",
+			Parent:     nil,
+		},
+		{
+			Id:         "chatglm_turbo",
+			Object:     "model",
+			Created:    1677649963,
+			OwnedBy:    "zhipu",
+			Permission: permission,
+			Root:       "chatglm_turbo",
 			Parent:     nil,
 		},
 		{
@@ -367,6 +511,24 @@ func init() {
 			OwnedBy:    "ali",
 			Permission: permission,
 			Root:       "qwen-plus",
+			Parent:     nil,
+		},
+		{
+			Id:         "qwen-max",
+			Object:     "model",
+			Created:    1677649963,
+			OwnedBy:    "ali",
+			Permission: permission,
+			Root:       "qwen-max",
+			Parent:     nil,
+		},
+		{
+			Id:         "qwen-max-longcontext",
+			Object:     "model",
+			Created:    1677649963,
+			OwnedBy:    "ali",
+			Permission: permission,
+			Root:       "qwen-max-longcontext",
 			Parent:     nil,
 		},
 		{
@@ -451,14 +613,14 @@ func RetrieveModel(c *gin.Context) {
 	if model, ok := openAIModelsMap[modelId]; ok {
 		c.JSON(200, model)
 	} else {
-		openAIError := OpenAIError{
+		Error := openai.Error{
 			Message: fmt.Sprintf("The model '%s' does not exist", modelId),
 			Type:    "invalid_request_error",
 			Param:   "model",
 			Code:    "model_not_found",
 		}
 		c.JSON(200, gin.H{
-			"error": openAIError,
+			"error": Error,
 		})
 	}
 }

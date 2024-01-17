@@ -10,20 +10,18 @@ import (
 	"one-api/controller"
 	"one-api/middleware"
 	"one-api/model"
+	"one-api/relay/channel/openai"
 	"one-api/router"
 	"os"
 	"strconv"
 )
 
-//go:embed web/build
+//go:embed web/build/*
 var buildFS embed.FS
-
-//go:embed web/build/index.html
-var indexPage []byte
 
 func main() {
 	common.SetupLogger()
-	common.SysLog("One API " + common.Version + " started")
+	common.SysLog(fmt.Sprintf("One API %s started", common.Version))
 	if os.Getenv("GIN_MODE") != "debug" {
 		gin.SetMode(gin.ReleaseMode)
 	}
@@ -50,6 +48,7 @@ func main() {
 
 	// Initialize options
 	model.InitOptionMap()
+	common.SysLog(fmt.Sprintf("using theme %s", common.Theme))
 	if common.RedisEnabled {
 		// for compatibility with old versions
 		common.MemoryCacheEnabled = true
@@ -82,7 +81,7 @@ func main() {
 		common.SysLog("batch update enabled with interval " + strconv.Itoa(common.BatchUpdateInterval) + "s")
 		model.InitBatchUpdater()
 	}
-	controller.InitTokenEncoders()
+	openai.InitTokenEncoders()
 
 	// Initialize HTTP server
 	server := gin.New()
@@ -95,7 +94,7 @@ func main() {
 	store := cookie.NewStore([]byte(common.SessionSecret))
 	server.Use(sessions.Sessions("session", store))
 
-	router.SetRouter(server, buildFS, indexPage)
+	router.SetRouter(server, buildFS)
 	var port = os.Getenv("PORT")
 	if port == "" {
 		port = strconv.Itoa(*common.Port)

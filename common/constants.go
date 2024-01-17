@@ -21,12 +21,9 @@ var QuotaPerUnit = 500 * 1000.0 // $0.002 / 1K tokens
 var DisplayInCurrencyEnabled = true
 var DisplayTokenStatEnabled = true
 
-var UsingSQLite = false
-
 // Any options with "Secret", "Token" in its key won't be return by GetOptions
 
 var SessionSecret = uuid.New().String()
-var SQLitePath = "one-api.db"
 
 var OptionMap map[string]string
 var OptionMapRWMutex sync.RWMutex
@@ -81,6 +78,7 @@ var QuotaForInviter = 0
 var QuotaForInvitee = 0
 var ChannelDisableThreshold = 5.0
 var AutomaticDisableChannelEnabled = false
+var AutomaticEnableChannelEnabled = false
 var QuotaRemindThreshold = 1000
 var PreConsumedQuota = 500
 var ApproximateTokenEnabled = false
@@ -97,6 +95,16 @@ var SyncFrequency = GetOrDefault("SYNC_FREQUENCY", 10*60) // unit is second
 
 var BatchUpdateEnabled = false
 var BatchUpdateInterval = GetOrDefault("BATCH_UPDATE_INTERVAL", 5)
+
+var RelayTimeout = GetOrDefault("RELAY_TIMEOUT", 0) // unit is second
+
+var GeminiSafetySetting = GetOrDefaultString("GEMINI_SAFETY_SETTING", "BLOCK_NONE")
+
+var Theme = GetOrDefaultString("THEME", "default")
+var ValidThemes = map[string]bool{
+	"default": true,
+	"berry":   true,
+}
 
 const (
 	RequestIdKey = "X-Oneapi-Request-Id"
@@ -187,6 +195,7 @@ const (
 	ChannelTypeAIProxyLibrary = 21
 	ChannelTypeFastGPT        = 22
 	ChannelTypeTencent        = 23
+	ChannelTypeGemini         = 24
 )
 
 var ChannelBaseURLs = []string{
@@ -214,4 +223,5 @@ var ChannelBaseURLs = []string{
 	"https://api.aiproxy.io",            // 21
 	"https://fastgpt.run/api/openapi",   // 22
 	"https://hunyuan.cloud.tencent.com", //23
+	"",                                  //24
 }

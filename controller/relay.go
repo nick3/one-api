@@ -4,196 +4,53 @@ import (
 	"fmt"
 	"net/http"
 	"one-api/common"
+	"one-api/relay/channel/openai"
+	"one-api/relay/constant"
+	"one-api/relay/controller"
+	"one-api/relay/util"
 	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 )
 
-type Message struct {
-	Role    string  `json:"role"`
-	Content string  `json:"content"`
-	Name    *string `json:"name,omitempty"`
-}
-
-const (
-	RelayModeUnknown = iota
-	RelayModeChatCompletions
-	RelayModeCompletions
-	RelayModeEmbeddings
-	RelayModeModerations
-	RelayModeImagesGenerations
-	RelayModeEdits
-	RelayModeAudio
-)
-
 // https://platform.openai.com/docs/api-reference/chat
 
-type GeneralOpenAIRequest struct {
-	Model       string    `json:"model,omitempty"`
-	Messages    []Message `json:"messages,omitempty"`
-	Prompt      any       `json:"prompt,omitempty"`
-	Stream      bool      `json:"stream,omitempty"`
-	MaxTokens   int       `json:"max_tokens,omitempty"`
-	Temperature float64   `json:"temperature,omitempty"`
-	TopP        float64   `json:"top_p,omitempty"`
-	N           int       `json:"n,omitempty"`
-	Input       any       `json:"input,omitempty"`
-	Instruction string    `json:"instruction,omitempty"`
-	Size        string    `json:"size,omitempty"`
-	Functions   any       `json:"functions,omitempty"`
-}
-
-func (r GeneralOpenAIRequest) ParseInput() []string {
-	if r.Input == nil {
-		return nil
-	}
-	var input []string
-	switch r.Input.(type) {
-	case string:
-		input = []string{r.Input.(string)}
-	case []any:
-		input = make([]string, 0, len(r.Input.([]any)))
-		for _, item := range r.Input.([]any) {
-			if str, ok := item.(string); ok {
-				input = append(input, str)
-			}
-		}
-	}
-	return input
-}
-
-type ChatRequest struct {
-	Model     string    `json:"model"`
-	Messages  []Message `json:"messages"`
-	MaxTokens int       `json:"max_tokens"`
-}
-
-type TextRequest struct {
-	Model     string    `json:"model"`
-	Messages  []Message `json:"messages"`
-	Prompt    string    `json:"prompt"`
-	MaxTokens int       `json:"max_tokens"`
-	//Stream   bool      `json:"stream"`
-}
-
-type ImageRequest struct {
-	Prompt string `json:"prompt"`
-	N      int    `json:"n"`
-	Size   string `json:"size"`
-}
-
-type AudioResponse struct {
-	Text string `json:"text,omitempty"`
-}
-
-type Usage struct {
-	PromptTokens     int `json:"prompt_tokens"`
-	CompletionTokens int `json:"completion_tokens"`
-	TotalTokens      int `json:"total_tokens"`
-}
-
-type OpenAIError struct {
-	Message string `json:"message"`
-	Type    string `json:"type"`
-	Param   string `json:"param"`
-	Code    any    `json:"code"`
-}
-
-type OpenAIErrorWithStatusCode struct {
-	OpenAIError
-	StatusCode int `json:"status_code"`
-}
-
-type TextResponse struct {
-	Choices []OpenAITextResponseChoice `json:"choices"`
-	Usage   `json:"usage"`
-	Error   OpenAIError `json:"error"`
-}
-
-type OpenAITextResponseChoice struct {
-	Index        int `json:"index"`
-	Message      `json:"message"`
-	FinishReason string `json:"finish_reason"`
-}
-
-type OpenAITextResponse struct {
-	Id      string                     `json:"id"`
-	Object  string                     `json:"object"`
-	Created int64                      `json:"created"`
-	Choices []OpenAITextResponseChoice `json:"choices"`
-	Usage   `json:"usage"`
-}
-
-type OpenAIEmbeddingResponseItem struct {
-	Object    string    `json:"object"`
-	Index     int       `json:"index"`
-	Embedding []float64 `json:"embedding"`
-}
-
-type OpenAIEmbeddingResponse struct {
-	Object string                        `json:"object"`
-	Data   []OpenAIEmbeddingResponseItem `json:"data"`
-	Model  string                        `json:"model"`
-	Usage  `json:"usage"`
-}
-
-type ImageResponse struct {
-	Created int `json:"created"`
-	Data    []struct {
-		Url string `json:"url"`
-	}
-}
-
-type ChatCompletionsStreamResponseChoice struct {
-	Delta struct {
-		Content string `json:"content"`
-	} `json:"delta"`
-	FinishReason *string `json:"finish_reason"`
-}
-
-type ChatCompletionsStreamResponse struct {
-	Id      string                                `json:"id"`
-	Object  string                                `json:"object"`
-	Created int64                                 `json:"created"`
-	Model   string                                `json:"model"`
-	Choices []ChatCompletionsStreamResponseChoice `json:"choices"`
-}
-
-type CompletionsStreamResponse struct {
-	Choices []struct {
-		Text         string `json:"text"`
-		FinishReason string `json:"finish_reason"`
-	} `json:"choices"`
-}
-
 func Relay(c *gin.Context) {
-	relayMode := RelayModeUnknown
+	relayMode := constant.RelayModeUnknown
 	if strings.HasPrefix(c.Request.URL.Path, "/v1/chat/completions") {
-		relayMode = RelayModeChatCompletions
+		relayMode = constant.RelayModeChatCompletions
 	} else if strings.HasPrefix(c.Request.URL.Path, "/v1/completions") {
-		relayMode = RelayModeCompletions
+		relayMode = constant.RelayModeCompletions
 	} else if strings.HasPrefix(c.Request.URL.Path, "/v1/embeddings") {
-		relayMode = RelayModeEmbeddings
+		relayMode = constant.RelayModeEmbeddings
 	} else if strings.HasSuffix(c.Request.URL.Path, "embeddings") {
-		relayMode = RelayModeEmbeddings
+		relayMode = constant.RelayModeEmbeddings
 	} else if strings.HasPrefix(c.Request.URL.Path, "/v1/moderations") {
-		relayMode = RelayModeModerations
+		relayMode = constant.RelayModeModerations
 	} else if strings.HasPrefix(c.Request.URL.Path, "/v1/images/generations") {
-		relayMode = RelayModeImagesGenerations
+		relayMode = constant.RelayModeImagesGenerations
 	} else if strings.HasPrefix(c.Request.URL.Path, "/v1/edits") {
-		relayMode = RelayModeEdits
-	} else if strings.HasPrefix(c.Request.URL.Path, "/v1/audio") {
-		relayMode = RelayModeAudio
+		relayMode = constant.RelayModeEdits
+	} else if strings.HasPrefix(c.Request.URL.Path, "/v1/audio/speech") {
+		relayMode = constant.RelayModeAudioSpeech
+	} else if strings.HasPrefix(c.Request.URL.Path, "/v1/audio/transcriptions") {
+		relayMode = constant.RelayModeAudioTranscription
+	} else if strings.HasPrefix(c.Request.URL.Path, "/v1/audio/translations") {
+		relayMode = constant.RelayModeAudioTranslation
 	}
-	var err *OpenAIErrorWithStatusCode
+	var err *openai.ErrorWithStatusCode
 	switch relayMode {
-	case RelayModeImagesGenerations:
-		err = relayImageHelper(c, relayMode)
-	case RelayModeAudio:
-		err = relayAudioHelper(c, relayMode)
+	case constant.RelayModeImagesGenerations:
+		err = controller.RelayImageHelper(c, relayMode)
+	case constant.RelayModeAudioSpeech:
+		fallthrough
+	case constant.RelayModeAudioTranslation:
+		fallthrough
+	case constant.RelayModeAudioTranscription:
+		err = controller.RelayAudioHelper(c, relayMode)
 	default:
-		err = relayTextHelper(c, relayMode)
+		err = controller.RelayTextHelper(c, relayMode)
 	}
 	if err != nil {
 		requestId := c.GetString(common.RequestIdKey)
@@ -206,17 +63,17 @@ func Relay(c *gin.Context) {
 			c.Redirect(http.StatusTemporaryRedirect, fmt.Sprintf("%s?retry=%d", c.Request.URL.Path, retryTimes-1))
 		} else {
 			if err.StatusCode == http.StatusTooManyRequests {
-				err.OpenAIError.Message = "当前分组上游负载已饱和，请稍后再试"
+				err.Error.Message = "当前分组上游负载已饱和，请稍后再试"
 			}
-			err.OpenAIError.Message = common.MessageWithRequestId(err.OpenAIError.Message, requestId)
+			err.Error.Message = common.MessageWithRequestId(err.Error.Message, requestId)
 			c.JSON(err.StatusCode, gin.H{
-				"error": err.OpenAIError,
+				"error": err.Error,
 			})
 		}
 		channelId := c.GetInt("channel_id")
 		common.LogError(c.Request.Context(), fmt.Sprintf("relay error (channel #%d): %s", channelId, err.Message))
 		// https://platform.openai.com/docs/guides/error-codes/api-errors
-		if shouldDisableChannel(&err.OpenAIError, err.StatusCode) {
+		if util.ShouldDisableChannel(&err.Error, err.StatusCode) {
 			channelId := c.GetInt("channel_id")
 			channelName := c.GetString("channel_name")
 			disableChannel(channelId, channelName, err.Message)
@@ -225,7 +82,7 @@ func Relay(c *gin.Context) {
 }
 
 func RelayNotImplemented(c *gin.Context) {
-	err := OpenAIError{
+	err := openai.Error{
 		Message: "API not implemented",
 		Type:    "one_api_error",
 		Param:   "",
@@ -237,7 +94,7 @@ func RelayNotImplemented(c *gin.Context) {
 }
 
 func RelayNotFound(c *gin.Context) {
-	err := OpenAIError{
+	err := openai.Error{
 		Message: fmt.Sprintf("Invalid URL (%s %s)", c.Request.Method, c.Request.URL.Path),
 		Type:    "invalid_request_error",
 		Param:   "",
