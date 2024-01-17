@@ -27,7 +27,10 @@ func init() {
 
 	if *PrintVersion {
 		fmt.Println(Version)
-		os.Exit(0)
+		if err != nil && !strings.Contains(err.Error(), "No names found") {
+		log.Fatal(err)
+		}
+	os.Exit(0)
 	}
 
 	if *PrintHelp {
