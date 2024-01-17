@@ -28,7 +28,7 @@ func init() {
 	if *PrintVersion {
 		fmt.Println(Version)
 		if err != nil && !strings.Contains(err.Error(), "No names found") {
-		log.Fatal(err)
+		log.Printf("Failed to retrieve version information: %v", err)
 		}
 	os.Exit(0)
 	}
