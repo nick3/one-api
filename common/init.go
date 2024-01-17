@@ -23,7 +23,7 @@ func printHelp() {
 }
 
 func init() {
-	flag.Parse()
+	cmd := exec.Command("git", "describe", "--tags", "--abbrev=0")
 
 	if *PrintVersion {
 		fmt.Println(Version)
