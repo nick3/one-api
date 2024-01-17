@@ -4,7 +4,7 @@
 
 
 <p align="center">
-  <a href="https://github.com/songquanpeng/one-api"><img src="https://raw.githubusercontent.com/songquanpeng/one-api/main/web/default/public/logo.png" width="150" height="150" alt="one-api logo"></a>
+  <a href="https://github.com/whtthd/one-api"><img src="https://raw.githubusercontent.com/whtthd/one-api/main/web/default/public/logo.png" width="150" height="150" alt="one-api logo"></a>
 </p>
 
 <div align="center">
@@ -16,37 +16,37 @@ _✨ 通过标准的 OpenAI API 格式访问所有的大模型，开箱即用 �
 </div>
 
 <p align="center">
-  <a href="https://raw.githubusercontent.com/songquanpeng/one-api/main/LICENSE">
-    <img src="https://img.shields.io/github/license/songquanpeng/one-api?color=brightgreen" alt="license">
+  <a href="https://raw.githubusercontent.com/whtthd/one-api/main/LICENSE">
+    <img src="https://img.shields.io/github/license/whtthd/one-api?color=brightgreen" alt="license">
   </a>
-  <a href="https://github.com/songquanpeng/one-api/releases/latest">
-    <img src="https://img.shields.io/github/v/release/songquanpeng/one-api?color=brightgreen&include_prereleases" alt="release">
+  <a href="https://github.com/whtthd/one-api/releases/latest">
+    <img src="https://img.shields.io/github/v/release/whtthd/one-api?color=brightgreen&include_prereleases" alt="release">
   </a>
   <a href="https://hub.docker.com/repository/docker/nick3/tthd-one-api">
     <img src="https://img.shields.io/docker/pulls/nick3/tthd-one-api?color=brightgreen" alt="docker pull">
   </a>
-  <a href="https://github.com/songquanpeng/one-api/releases/latest">
-    <img src="https://img.shields.io/github/downloads/songquanpeng/one-api/total?color=brightgreen&include_prereleases" alt="release">
+  <a href="https://github.com/whtthd/one-api/releases/latest">
+    <img src="https://img.shields.io/github/downloads/whtthd/one-api/total?color=brightgreen&include_prereleases" alt="release">
   </a>
-  <a href="https://goreportcard.com/report/github.com/songquanpeng/one-api">
-    <img src="https://goreportcard.com/badge/github.com/songquanpeng/one-api" alt="GoReportCard">
+  <a href="https://goreportcard.com/report/github.com/whtthd/one-api">
+    <img src="https://goreportcard.com/badge/github.com/whtthd/one-api" alt="GoReportCard">
   </a>
 </p>
 
 <p align="center">
-  <a href="https://github.com/songquanpeng/one-api#部署">部署教程</a>
+  <a href="https://github.com/whtthd/one-api#部署">部署教程</a>
   ·
-  <a href="https://github.com/songquanpeng/one-api#使用方法">使用方法</a>
+  <a href="https://github.com/whtthd/one-api#使用方法">使用方法</a>
   ·
-  <a href="https://github.com/songquanpeng/one-api/issues">意见反馈</a>
+  <a href="https://github.com/whtthd/one-api/issues">意见反馈</a>
   ·
-  <a href="https://github.com/songquanpeng/one-api#截图展示">截图展示</a>
+  <a href="https://github.com/whtthd/one-api#截图展示">截图展示</a>
   ·
   <a href="https://openai.justsong.cn/">在线演示</a>
   ·
-  <a href="https://github.com/songquanpeng/one-api#常见问题">常见问题</a>
+  <a href="https://github.com/whtthd/one-api#常见问题">常见问题</a>
   ·
-  <a href="https://github.com/songquanpeng/one-api#相关项目">相关项目</a>
+  <a href="https://github.com/whtthd/one-api#相关项目">相关项目</a>
   ·
   <a href="https://iamazing.cn/page/reward">赞赏支持</a>
 </p>
@@ -115,9 +115,9 @@ docker run --name one-api -d --restart always -p 3000:3000 -e SQL_DSN="root:1234
 
 数据和日志将会保存在宿主机的 `/home/ubuntu/data/one-api` 目录，请确保该目录存在且具有写入权限，或者更改为合适的目录。
 
-如果启动失败，请添加 `--privileged=true`，具体参考 https://github.com/songquanpeng/one-api/issues/482 。
+如果启动失败，请添加 `--privileged=true`，具体参考 https://github.com/whtthd/one-api/issues/482 。
 
-如果上面的镜像无法拉取，可以尝试使用 GitHub 的 Docker 镜像，将上面的 `nick3/tthd-one-api` 替换为 `ghcr.io/songquanpeng/one-api` 即可。
+如果上面的镜像无法拉取，可以尝试使用 GitHub 的 Docker 镜像，将上面的 `nick3/tthd-one-api` 替换为 `ghcr.io/whtthd/one-api` 即可。
 
 如果你的并发量较大，**务必**设置 `SQL_DSN`，详见下面[环境变量](#环境变量)一节。
 
@@ -169,9 +169,9 @@ docker-compose ps
 ```
 
 ### 手动部署
-1. 从 [GitHub Releases](https://github.com/songquanpeng/one-api/releases/latest) 下载可执行文件或者从源码编译：
+1. 从 [GitHub Releases](https://github.com/whtthd/one-api/releases/latest) 下载可执行文件或者从源码编译：
    ```shell
-   git clone https://github.com/songquanpeng/one-api.git
+   git clone https://github.com/whtthd/one-api.git
    
    # 构建前端
    cd one-api/web
@@ -205,9 +205,9 @@ docker-compose ps
 
 ### 宝塔部署教程
 
-详见 [#175](https://github.com/songquanpeng/one-api/issues/175)。
+详见 [#175](https://github.com/whtthd/one-api/issues/175)。
 
-如果部署后访问出现空白页面，详见 [#97](https://github.com/songquanpeng/one-api/issues/97)。
+如果部署后访问出现空白页面，详见 [#97](https://github.com/whtthd/one-api/issues/97)。
 
 ### 部署第三方服务配合 One API 使用
 > 欢迎 PR 添加更多示例。
