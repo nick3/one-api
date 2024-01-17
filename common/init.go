@@ -9,6 +9,7 @@ import (
 )
 
 var (
+	Version = getVersion()
 	Port         = flag.Int("port", 3000, "the listening port")
 	PrintVersion = flag.Bool("version", false, "print version and exit")
 	PrintHelp    = flag.Bool("help", false, "print help and exit")
