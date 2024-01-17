@@ -24,17 +24,17 @@ let headerButtons = [
     to: '/token',
     icon: 'key'
   },
-  {
-    name: '兑换',
-    to: '/redemption',
-    icon: 'dollar sign',
-    admin: true
-  },
-  {
-    name: '充值',
-    to: '/topup',
-    icon: 'cart'
-  },
+  // {
+  //   name: '兑换',
+  //   to: '/redemption',
+  //   icon: 'dollar sign',
+  //   admin: true
+  // },
+  // {
+  //   name: '充值',
+  //   to: '/topup',
+  //   icon: 'cart'
+  // },
   {
     name: '用户',
     to: '/user',
