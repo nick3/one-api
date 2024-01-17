@@ -12,7 +12,7 @@ const OperationSetting = () => {
     PreConsumedQuota: 0,
     ModelRatio: '',
     GroupRatio: '',
-    TopUpLink: '',
+    // TopUpLink: '',
     ChatLink: '',
     QuotaPerUnit: 0,
     AutomaticDisableChannelEnabled: '',
@@ -117,9 +117,9 @@ const OperationSetting = () => {
         }
         break;
       case 'general':
-        if (originInputs['TopUpLink'] !== inputs.TopUpLink) {
-          await updateOption('TopUpLink', inputs.TopUpLink);
-        }
+        // if (originInputs['TopUpLink'] !== inputs.TopUpLink) {
+        //   await updateOption('TopUpLink', inputs.TopUpLink);
+        // }
         if (originInputs['ChatLink'] !== inputs.ChatLink) {
           await updateOption('ChatLink', inputs.ChatLink);
         }
@@ -152,7 +152,7 @@ const OperationSetting = () => {
             通用设置
           </Header>
           <Form.Group widths={4}>
-            <Form.Input
+            {/* <Form.Input
               label='充值链接'
               name='TopUpLink'
               onChange={handleInputChange}
@@ -160,7 +160,7 @@ const OperationSetting = () => {
               value={inputs.TopUpLink}
               type='link'
               placeholder='例如发卡网站的购买链接'
-            />
+            /> */}
             <Form.Input
               label='聊天页面链接'
               name='ChatLink'
@@ -229,10 +229,10 @@ const OperationSetting = () => {
           </Form.Group>
           <Form.Group widths={4}>
             <Form.Input label='目标时间' value={historyTimestamp} type='datetime-local'
-                        name='history_timestamp'
-                        onChange={(e, { name, value }) => {
-                          setHistoryTimestamp(value);
-                        }} />
+              name='history_timestamp'
+              onChange={(e, { name, value }) => {
+                setHistoryTimestamp(value);
+              }} />
           </Form.Group>
           <Form.Button onClick={() => {
             deleteHistoryLogs().then();
@@ -271,10 +271,10 @@ const OperationSetting = () => {
               onChange={handleInputChange}
             />
             <Form.Checkbox
-                checked={inputs.AutomaticEnableChannelEnabled === 'true'}
-                label='成功时自动启用通道'
-                name='AutomaticEnableChannelEnabled'
-                onChange={handleInputChange}
+              checked={inputs.AutomaticEnableChannelEnabled === 'true'}
+              label='成功时自动启用通道'
+              name='AutomaticEnableChannelEnabled'
+              onChange={handleInputChange}
             />
           </Form.Group>
           <Form.Button onClick={() => {

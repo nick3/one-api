@@ -41,7 +41,7 @@ func SetApiRouter(router *gin.Engine) {
 				selfRoute.DELETE("/self", controller.DeleteSelf)
 				selfRoute.GET("/token", controller.GenerateAccessToken)
 				selfRoute.GET("/aff", controller.GetAffCode)
-				selfRoute.POST("/topup", controller.TopUp)
+				// selfRoute.POST("/topup", controller.TopUp)
 			}
 
 			adminRoute := userRoute.Group("/")
@@ -88,16 +88,16 @@ func SetApiRouter(router *gin.Engine) {
 			tokenRoute.PUT("/", controller.UpdateToken)
 			tokenRoute.DELETE("/:id", controller.DeleteToken)
 		}
-		redemptionRoute := apiRouter.Group("/redemption")
-		redemptionRoute.Use(middleware.AdminAuth())
-		{
-			redemptionRoute.GET("/", controller.GetAllRedemptions)
-			redemptionRoute.GET("/search", controller.SearchRedemptions)
-			redemptionRoute.GET("/:id", controller.GetRedemption)
-			redemptionRoute.POST("/", controller.AddRedemption)
-			redemptionRoute.PUT("/", controller.UpdateRedemption)
-			redemptionRoute.DELETE("/:id", controller.DeleteRedemption)
-		}
+		// redemptionRoute := apiRouter.Group("/redemption")
+		// redemptionRoute.Use(middleware.AdminAuth())
+		// {
+		// 	redemptionRoute.GET("/", controller.GetAllRedemptions)
+		// 	redemptionRoute.GET("/search", controller.SearchRedemptions)
+		// 	redemptionRoute.GET("/:id", controller.GetRedemption)
+		// 	redemptionRoute.POST("/", controller.AddRedemption)
+		// 	redemptionRoute.PUT("/", controller.UpdateRedemption)
+		// 	redemptionRoute.DELETE("/:id", controller.DeleteRedemption)
+		// }
 		logRoute := apiRouter.Group("/log")
 		logRoute.GET("/", middleware.AdminAuth(), controller.GetAllLogs)
 		logRoute.DELETE("/", middleware.AdminAuth(), controller.DeleteHistoryLogs)
