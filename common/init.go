@@ -9,6 +9,7 @@ import (
 )
 
 var (
+	Version = getVersion()
 	Port         = flag.Int("port", 3000, "the listening port")
 	PrintVersion = flag.Bool("version", false, "print version and exit")
 	PrintHelp    = flag.Bool("help", false, "print help and exit")
@@ -23,11 +24,14 @@ func printHelp() {
 }
 
 func init() {
-	flag.Parse()
+	cmd := exec.Command("git", "describe", "--tags", "--abbrev=0")
 
 	if *PrintVersion {
 		fmt.Println(Version)
-		os.Exit(0)
+		if err != nil && !strings.Contains(err.Error(), "No names found") {
+		log.Printf("Failed to retrieve version information: %v", err)
+		}
+	os.Exit(0)
 	}
 
 	if *PrintHelp {
